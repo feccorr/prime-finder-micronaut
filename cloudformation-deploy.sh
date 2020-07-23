@@ -4,9 +4,7 @@ if [ ! "${1}" == "skip-build" ]; then
   docker build . -t prime-finder
   mkdir -p build
   docker run --rm --entrypoint cat prime-finder  /home/application/function.zip > build/function.zip
-  docker image rm prime-finder
 fi
-
 
 # check for role
 ROLE_NAME=lambda-basic-role
@@ -19,6 +17,17 @@ if [ "${ROLE_ARN}" == "" ]; then
     exit 1
 fi
 
-aws lambda create-function --function-name prime-finder \
---zip-file fileb://build/function.zip --handler function.handler --runtime provided \
---role ${ROLE_ARN}
+S3_BUCKET_NAME=micronaut-graal-demo
+
+if aws s3api head-bucket --bucket "${S3_BUCKET_NAME}" 2>&1 | grep -q "Not Found"; then
+  echo "Bucket not found, creating it..."
+  aws s3 mb s3://${S3_BUCKET_NAME}
+fi
+
+
+aws cloudformation package --template-file sam.yaml --output-template-file packaged-sam.yaml --s3-bucket ${S3_BUCKET_NAME}
+aws cloudformation deploy --template-file ./packaged-sam.yaml --stack-name MicronautGraalVmDemo --capabilities CAPABILITY_IAM
+aws cloudformation describe-stacks --stack-name MicronautGraalVmDemo --query "Stacks[0].Outputs[0].OutputValue"| cut -d \" -f 2
+
+# To delete everything
+#aws cloudformation delete-stack --stack-name MicronautGraalVmDemo

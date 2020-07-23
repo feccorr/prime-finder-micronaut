@@ -5,13 +5,13 @@ import io.micronaut.http.annotation.Get;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Controller("/")
+@Controller("/") // <1>
 public class PrimeFinderController {
-    private static final Logger LOG = LoggerFactory.getLogger(PrimeFinderController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PrimeFinderController.class); // <2>
 
     private final PrimeFinderService primeFinderService;
 
-    public PrimeFinderController(PrimeFinderService primeFinderService) {
+    public PrimeFinderController(PrimeFinderService primeFinderService) { // <3>
         this.primeFinderService = primeFinderService;
     }
 

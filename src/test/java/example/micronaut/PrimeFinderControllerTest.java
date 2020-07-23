@@ -1,6 +1,5 @@
 package example.micronaut;
 
-
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
